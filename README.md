@@ -1,20 +1,23 @@
 # Установка
+
+## Выполнить команды:
 ```
 composer install
 ```
 ```
 php artisan migrate
 ```
-```
-php artisan app:fetch-api-data
-```
 
-## Добавить в .env:
+## Изменить в .env данные о бд и добавить следующие строки:
 ```
 WB_API_ADDRESS="http://109.73.206.144:6969/api/"
 ```
 ```
 WB_API_KEY="E6kUTYrYwZq2tN4QEtyzsbEBk3ie"
+```
+# Запуск
+```
+php artisan app:fetch-api-data
 ```
 
 # Тестовая база данных:
