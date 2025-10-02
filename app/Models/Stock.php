@@ -9,6 +9,7 @@ class Stock extends Model
     protected $table = 'stocks';
 
     protected $fillable = [
+        'account_id',
         'date',
         'last_change_date',
         'supplier_article',

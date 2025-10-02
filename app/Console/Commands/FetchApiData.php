@@ -18,7 +18,7 @@ class FetchApiData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:fetch-api-data';
+    protected $signature = 'app:fetch-api-data {--account=}';
 
     /**
      * The console command description.
@@ -32,6 +32,9 @@ class FetchApiData extends Command
      */
     public function handle()
     {
+        $account_id = $this->option('account');
+        echo($account_id . "\n");
+        if ($account_id!= 10) exit;
         $url = getenv('WB_API_ADDRESS');
         $key = getenv('WB_API_KEY');
         
@@ -41,7 +44,7 @@ class FetchApiData extends Command
         foreach($paths as $path){
             $page = 1; 
             do {
-                echo("Processing " . $path . " page: " . $page . "\n");
+                echo("[Processing] " . $path . " page: " . $page . "\n");
                 $decoded = json_decode($this->getResponse($url, $path, $page, $key));
                 $data = $decoded -> data;
                 $max_page = $decoded -> meta -> last_page;
@@ -80,7 +83,10 @@ class FetchApiData extends Command
         if ($path == 'sales'){
             foreach($data as $item){
                 Sale::updateOrCreate(
-                    ['g_number' => $item->g_number],
+                    [
+                        'account_id' => $account_id,
+                        'g_number' => $item->g_number,
+                    ],
                     [
                         'date' => $item->date,
                         'last_change_date' => $item->last_change_date,
@@ -114,7 +120,10 @@ class FetchApiData extends Command
         } else if ($path == 'orders'){
             foreach($data as $item){
                 Order::updateOrCreate(
-                    ['g_number' => $item->g_number],
+                    [
+                        'account_id' => $account_id,
+                        'g_number' => $item->g_number,
+                    ],
                     [
                         'date' => $item->date,
                         'last_change_date' => $item->last_change_date,
@@ -140,6 +149,7 @@ class FetchApiData extends Command
             foreach($data as $item){
                 Stock::updateOrCreate(
                     [
+                        'account_id' => $account_id,
                         'barcode' => $item->barcode,
                         'warehouse_name' => $item->warehouse_name
                     ],
@@ -168,6 +178,7 @@ class FetchApiData extends Command
             foreach($data as $item){
                 Income::updateOrCreate(
                     [
+                        'account_id' => $account_id,
                         'income_id' => $item->income_id,
                         'barcode' => $item->barcode
                     ],

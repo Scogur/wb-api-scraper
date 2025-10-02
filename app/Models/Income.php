@@ -9,6 +9,7 @@ class Income extends Model
     protected $table = 'incomes';
 
     protected $fillable = [
+        'account_id',
         'income_id',
         'number',
         'date',

@@ -9,6 +9,7 @@ class Sale extends Model
     protected $table = 'sales';
 
     protected $fillable = [
+        'account_id',
         'g_number',
         'date',
         'last_change_date',
