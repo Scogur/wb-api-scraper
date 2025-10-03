@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use App\Models\ApiService;
+
 class AddNewApiService extends Command
 {
     /**
@@ -27,8 +29,8 @@ class AddNewApiService extends Command
     {
         $name = $this->option('name');
         try {
-            echo("Adding new Token Type with name=" . $name . "\n");
-            TokenType::Create([
+            echo("Adding new Api service with name=" . $name . "\n");
+            ApiService::Create([
                 'name' => $name,
             ]);
             echo("Done." . "\n");

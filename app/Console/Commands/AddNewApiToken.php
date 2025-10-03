@@ -4,6 +4,11 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use App\Models\Token;
+use App\Models\ApiService;
+use App\Models\Account;
+use App\Models\TokenType;
+
 class AddNewApiToken extends Command
 {
     /**
@@ -31,30 +36,25 @@ class AddNewApiToken extends Command
         $value = $this->option('value');
         
         try {
+            echo("Searching account with id=" . $account_id . "\n");
             $account = Account::findOrFail($account_id);
-
+            echo("Searching api service with id=" . $api_service_id . "\n");
             $service = ApiService::findOrFail($api_service_id);
-
+            echo("Searching token type with id=" . $token_type_id . "\n");
             $tokenType = TokenType::findOrFail($token_type_id);
-
-            if (! $service->tokenTypes()->where('token_type_id', $tokenType->id)->exists()) {
-                echo("Token type " . $tokenType->name . " is not allowed for " . $service->name . "\n");
-                exit;
-            }
-
-            // Создаём токен
+            echo("Adding data to table.\n");
             $token = Token::create([
                 'account_id'     => $account_id,
                 'api_service_id' => $api_service_id,
                 'token_type_id'  => $token_type_id,
                 'value'          => $value,
             ]);
-
+            echo("Done.\n");
         } catch (ModelNotFoundException $e) {
             echo("Account, service or token type not found.\n");
 
         } catch (Exception $e) {
-            echo("Ошибка: " . $e->getMessage() . "\n");
+            echo("Error: " . $e->getMessage() . "\n");
         }
     }
 }

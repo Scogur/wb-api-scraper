@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Token extends Model
-{
+{   
+    protected $table = 'api_tokens';
     protected $fillable = [
         'account_id','api_service_id','token_type_id','value'
     ];
