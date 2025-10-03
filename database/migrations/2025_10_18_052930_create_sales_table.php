@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('sales', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
             $table->string('g_number')->unique();
             $table->dateTime('date')->nullable();
             $table->dateTime('last_change_date')->nullable();
@@ -21,16 +22,25 @@ return new class extends Migration
             $table->string('barcode')->nullable();
             $table->decimal('total_price', 15, 2)->nullable();
             $table->integer('discount_percent')->nullable();
+            $table->boolean('is_supply')->nullable();
+            $table->boolean('is_realization')->nullable();
+            $table->decimal('promo_code_discount', 15, 2)->nullable();
             $table->string('warehouse_name')->nullable();
-            $table->string('oblast')->nullable();
+            $table->string('country_name')->nullable();
+            $table->string('oblast_okrug_name')->nullable();
+            $table->string('region_name')->nullable();
             $table->bigInteger('income_id')->nullable();
+            $table->string('sale_id')->nullable();
             $table->bigInteger('odid')->nullable();
+            $table->string('spp')->nullable();
+            $table->decimal('for_pay', 15, 2)->nullable();
+            $table->decimal('finished_price', 15, 2)->nullable();
+            $table->decimal('price_with_disc', 15, 2)->nullable();
             $table->bigInteger('nm_id')->nullable();
             $table->string('subject')->nullable();
             $table->string('category')->nullable();
             $table->string('brand')->nullable();
-            $table->boolean('is_cancel')->nullable();
-            $table->dateTime('cancel_dt')->nullable();
+            $table->boolean('is_storno')->nullable();
             $table->timestamps();
         });
     }
@@ -40,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('sales');
     }
 };

@@ -5,11 +5,13 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 use App\Models\Sale;
 use App\Models\Order;
 use App\Models\Stock;
 use App\Models\Income;
+use App\Models\Account;
 
 class FetchApiData extends Command
 {
@@ -18,7 +20,7 @@ class FetchApiData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:fetch-api-data {--account=}';
+    protected $signature = 'app:fetch-api-data {--account=} {--fresh}';
 
     /**
      * The console command description.
@@ -33,55 +35,79 @@ class FetchApiData extends Command
     public function handle()
     {
         $account_id = $this->option('account');
+        $fresh = $this->option('fresh');
         echo($account_id . "\n");
-        if ($account_id!= 10) exit;
         $url = getenv('WB_API_ADDRESS');
         $key = getenv('WB_API_KEY');
-        
+        try {
+            echo("Searching accound with id=" . $account_id . "\n");
+            $account = Account::findOrFail($account_id);
+            echo("Done." . "\n");
+        } catch (Exception $e) {
+            echo("Error: " . $e->getMessage() . "\n");
+            exit;
+        }
+
         $page = 1;
         $max_page = 1;
         $paths = ['sales', 'orders', 'stocks', 'incomes'];
         foreach($paths as $path){
             $page = 1; 
+            if ($fresh) {
+                switch ($path) {
+                    case 'sales':
+                        $latest = Sale::latest('date')->first();
+                        break;
+                    case 'orders':
+                        $latest = Order::latest('date')->first();
+                        break;
+                    case 'stocks':
+                        $latest = Stock::latest('date')->first();
+                        break;
+                    case 'incomes':
+                        $latest = Income::latest('date')->first();
+                        break;
+                }
+                $start_date = $latest ? Carbon::parse($latest->date)->format('Y-m-d') : Carbon::parse('2020-08-01');
+            }
             do {
                 echo("[Processing] " . $path . " page: " . $page . "\n");
-                $decoded = json_decode($this->getResponse($url, $path, $page, $key));
+                $decoded = json_decode($this->getResponse($url, $path, $page, $key, $start_date));
                 $data = $decoded -> data;
                 $max_page = $decoded -> meta -> last_page;
-                $this->fillData($data, $path);
+                $this->fillData($data, $path, $account);
                 $page++;
             } while ($page < $max_page);
             echo("Done\n");
         }
-        // print_r($decoded -> data);
-        // print_r($response);
     }
-    function getResponse($url, $path, $page, $key)
+    function getResponse($url, $path, $page, $key, $date_from)
     {
         $today = date('Y-m-d');
-        if ($path!='stocks'){
-            $response = Http::get($url . $path, 
-                ['key' => $key,
-                'dateFrom' => '2020-08-01',
-                'dateTo' => $today,
-                'page' => $page,
-            ]);
-            return $response;
-        } else{
-            $response = Http::retry(5, 1000, function ($exception, $request) {
-                return $exception->getCode() === 429;
-            }, throw: false)->get($url . $path, $query);
-            return $response;
+        $query = [
+            'key' => $key,
+            'page' => $page,
+        ];
+        if ($path != 'stocks') {
+            $query['dateFrom'] = $date_from;
+            $query['dateTo'] = $today;
+        } else {
+            $query['dateFrom'] = $today;
         }
+        $response = Http::retry(5, 2000, function ($exception, $request) {
+            return $exception->getCode() === 429;
+        })->get($url . $path, $query);
+
+        return $response;
     }
 
-    function fillData($data, $path)
+    function fillData($data, $path, $account)
     {
         if ($path == 'sales'){
             foreach($data as $item){
                 Sale::updateOrCreate(
                     [
-                        'account_id' => $account_id,
+                        'account_id' => $account->id,
                         'g_number' => $item->g_number,
                     ],
                     [
@@ -118,7 +144,7 @@ class FetchApiData extends Command
             foreach($data as $item){
                 Order::updateOrCreate(
                     [
-                        'account_id' => $account_id,
+                        'account_id' => $account->id,
                         'g_number' => $item->g_number,
                     ],
                     [
@@ -146,7 +172,7 @@ class FetchApiData extends Command
             foreach($data as $item){
                 Stock::updateOrCreate(
                     [
-                        'account_id' => $account_id,
+                        'account_id' => $account->id,
                         'barcode' => $item->barcode,
                         'warehouse_name' => $item->warehouse_name
                     ],
@@ -175,7 +201,7 @@ class FetchApiData extends Command
             foreach($data as $item){
                 Income::updateOrCreate(
                     [
-                        'account_id' => $account_id,
+                        'account_id' => $account->id,
                         'income_id' => $item->income_id,
                         'barcode' => $item->barcode
                     ],

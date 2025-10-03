@@ -11,20 +11,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('incomes', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('income_id');
-            $table->string('number')->nullable();
+            $table->foreignId('account_id')->constrained()->cascadeOnDelete();
+            $table->string('g_number')->unique();
             $table->dateTime('date')->nullable();
             $table->dateTime('last_change_date')->nullable();
             $table->string('supplier_article')->nullable();
             $table->string('tech_size')->nullable();
-            $table->string('barcode');
-            $table->integer('quantity')->nullable();
+            $table->string('barcode')->nullable();
             $table->decimal('total_price', 15, 2)->nullable();
-            $table->dateTime('date_close')->nullable();
+            $table->integer('discount_percent')->nullable();
             $table->string('warehouse_name')->nullable();
+            $table->string('oblast')->nullable();
+            $table->bigInteger('income_id')->nullable();
+            $table->bigInteger('odid')->nullable();
             $table->bigInteger('nm_id')->nullable();
+            $table->string('subject')->nullable();
+            $table->string('category')->nullable();
+            $table->string('brand')->nullable();
+            $table->boolean('is_cancel')->nullable();
+            $table->dateTime('cancel_dt')->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incomes');
+        Schema::dropIfExists('orders');
     }
 };
