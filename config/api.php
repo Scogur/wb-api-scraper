@@ -1,4 +1,4 @@
 <?php
 return [
-    'accounts_schedule' => [1],
+    'accounts_schedule' => [1,],
 ];
