@@ -68,14 +68,11 @@ class FetchApiData extends Command
             ]);
             return $response;
         } else{
-            $response = Http::get($url . $path, 
-                ['key' => $key,
-                'dateFrom' => $today,
-                'page' => $page,
-            ]);
+            $response = Http::retry(5, 1000, function ($exception, $request) {
+                return $exception->getCode() === 429;
+            }, throw: false)->get($url . $path, $query);
             return $response;
         }
-        
     }
 
     function fillData($data, $path)
