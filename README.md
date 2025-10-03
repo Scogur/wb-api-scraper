@@ -18,31 +18,31 @@ WB_API_KEY="E6kUTYrYwZq2tN4QEtyzsbEBk3ie"
 
 # Добавление новой компании
 ```
-php artisan app:app:add-new-company --name=company_name
+php artisan app:add-new-company --name=company_name
 ```
 Вместо company_name вписать название компании.
 
 # Добавление нового аккаунта
 ```
-php artisan app:app:add-new-account --company-id=id --name=account_name
+php artisan app:add-new-account --company-id=id --name=account_name
 ```
 Вместо company_name вписать название компании, вместо id вписать id существующей компании.
 
 # Добавление нового API сервиса
 ```
-php artisan app:app:add-new-api-service --name=service_name
+php artisan app:add-new-api-service --name=service_name
 ```
 Вместо service_name вписать название сервиса.
 
 # Добавление нового типа токена
 ```
-php artisan app:app:add-new-token-type --name=type_name
+php artisan app:add-new-token-type --name=type_name
 ```
 Вместо type_name вписать название типа токена.
 
 # Добавление нового токена
 ```
-php artisan app:app:add-new-api-token --account-id=acc_id --api-service-id=serv_id --token-type-id=type_id --value=token_value
+php artisan app:add-new-api-token --account-id=acc_id --api-service-id=serv_id --token-type-id=type_id --value=token_value
 ```
 Вместо acc_id вписать id аккаунта, вместо serv_id вписать id сервиса, вместо type_id вписать id типа токена, вместо token_value вписать значение токена.
 
