@@ -68,7 +68,10 @@ class FetchApiData extends Command
                         $latest = Income::latest('date')->first();
                         break;
                 }
-                $start_date = $latest ? Carbon::parse($latest->date)->format('Y-m-d') : Carbon::parse('2020-08-01');
+                $start_date = $latest ? Carbon::parse($latest->date)->format('Y-m-d') : '2020-08-01';
+            }
+            else {
+                $start_date = '2020-08-01';
             }
             do {
                 echo("[Processing] " . $path . " page: " . $page . "\n");
